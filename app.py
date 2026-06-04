@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = "secret-key"
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///finance.db"
 db = SQLAlchemy(app)
@@ -44,7 +45,7 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        print("User saved!")
+        print("User information saved!")
 
         return redirect(url_for("login"))
 
@@ -55,14 +56,26 @@ def login():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
-        
+
         user = User.query.filter_by(username=username).first()
 
-        if user:
-            print("Found user")
-        else:
-            print("User not found")
+        if not user:
+            return render_template(
+                "login.html",
+                error="User not found"
+            )
 
+        elif user.password != password:
+            return render_template(
+                "login.html",
+                error="Incorrect password"
+            )
+
+        else:
+            session["user_id"] = user.id
+            print(f"the current user id is: { user.id }")
+            return redirect(url_for("dashboard"))
+        
     return render_template("login.html")
 
 @app.route("/dashboard")

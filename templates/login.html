@@ -14,3 +14,9 @@
         <button type="submit">Login</button>
     </form>
 </div>
+
+<div class="section">
+    {% if error %}
+        <p>{{ error }}</p>
+    {% endif %}
+</div>
