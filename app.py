@@ -8,7 +8,6 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///finance.db"
 db = SQLAlchemy(app)
 
 class User(db.Model):
-
     id = db.Column(
         db.Integer,
         primary_key=True
@@ -24,6 +23,32 @@ class User(db.Model):
         db.String(200),
         nullable=False
     )
+
+class Transaction(db.Model):
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    amount = db.Column(
+        db.Float,
+        nullable=False
+    )
+
+    category = db.Column(
+        db.String(100),
+        nullable=False
+    )
+
+    description = db.Column(
+        db.String(200)
+    )
+
+    user_id = db.Column(
+        db.Integer,
+        nullable=False
+    )
+
 
 @app.route("/")
 def home():
@@ -73,14 +98,56 @@ def login():
 
         else:
             session["user_id"] = user.id
-            print(f"the current user id is: { user.id }")
+            print(f"the current user id is: {session.get('user_id')}")
             return redirect(url_for("dashboard"))
         
     return render_template("login.html")
 
 @app.route("/dashboard")
 def dashboard():
-    return render_template("dashboard.html")
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+    
+    user = User.query.get(session["user_id"])
+
+    transactions = Transaction.query.filter_by(user_id=session["user_id"]).all()
+
+    return render_template(
+        "dashboard.html",
+        user=user,
+        transactions=transactions
+    )
+
+@app.route("/logout")
+def logout():
+    session.clear()
+
+    return redirect(url_for("home"))
+
+@app.route("/add_transaction", methods=["GET", "POST"])
+def add_transaction():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+    
+    if request.method == "POST":
+        amount = float(request.form["amount"])
+        category = request.form["category"]
+        description = request.form["description"]
+        
+        new_transaction = Transaction(
+            amount=amount,
+            category=category,
+            description=description,
+            user_id=session["user_id"]
+        )
+
+        db.session.add(new_transaction)
+        db.session.commit()
+
+        return redirect(url_for("dashboard"))
+    
+    return render_template("add_transaction.html")
+
 
 if __name__ == "__main__":  
     with app.app_context(): 

@@ -1,3 +1,23 @@
 <h1>Dashboard</h1>
 
-<p>Welcome to your finance dashboard!</p>
+<p>Welcome {{ user.username }}, to your finance dashboard!</p>
+
+<a href="/add_transaction">
+    Add Transaction
+</a>
+
+{% for transaction in transactions %}
+
+    <p>
+        {{ transaction.amount }}
+        -
+        {{ transaction.category }}
+        -
+        {{ transaction.description }}
+    </p>
+
+{% endfor %}
+
+<a href="/logout">
+    Logout
+</a>
