@@ -6,10 +6,14 @@
     Add Transaction
 </a>
 
+<br><br>
+
 {% for transaction in transactions %}
 
     <p>
-        {{ transaction.amount }}
+        {{ transaction.transaction_type }}
+        -
+        ${{ transaction.amount }}
         -
         {{ transaction.category }}
         -
@@ -17,6 +21,13 @@
     </p>
 
 {% endfor %}
+
+<h2>Balance: ${{ balance }}</h2>
+<h3>Income Total: ${{ income_total }}</h2>
+<h3>Expense Total: ${{ expense_total }}</h2>
+<h3>Total Transactions: {{ transaction_count }}</h3>
+
+<br><br>
 
 <a href="/logout">
     Logout

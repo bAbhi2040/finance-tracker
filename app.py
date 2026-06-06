@@ -46,6 +46,11 @@ class Transaction(db.Model):
 
     user_id = db.Column(
         db.Integer,
+        nullable=False     
+    )
+
+    transaction_type = db.Column(
+        db.String(20),
         nullable=False
     )
 
@@ -112,10 +117,27 @@ def dashboard():
 
     transactions = Transaction.query.filter_by(user_id=session["user_id"]).all()
 
+    income_total = 0
+    expense_total = 0
+    for transaction in transactions:
+        if transaction.transaction_type == "Income":
+            income_total += transaction.amount
+
+        elif transaction.transaction_type == "Expense":
+            expense_total += transaction.amount
+
+    balance = income_total - expense_total
+
+    transaction_count = len(transactions)
+
     return render_template(
         "dashboard.html",
         user=user,
-        transactions=transactions
+        transactions=transactions,
+        income_total=income_total,
+        expense_total=expense_total,
+        transaction_count=transaction_count,
+        balance=balance
     )
 
 @app.route("/logout")
@@ -133,12 +155,14 @@ def add_transaction():
         amount = float(request.form["amount"])
         category = request.form["category"]
         description = request.form["description"]
+        transaction_type = request.form["transaction_type"]
         
         new_transaction = Transaction(
             amount=amount,
             category=category,
             description=description,
-            user_id=session["user_id"]
+            user_id=session["user_id"],
+            transaction_type=transaction_type
         )
 
         db.session.add(new_transaction)
