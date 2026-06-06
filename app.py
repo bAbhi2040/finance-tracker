@@ -65,8 +65,6 @@ def register():
         username = request.form["username"]
         password = request.form["password"]
 
-        print(f"Creating user: {username}")
-
         new_user = User(
             username=username,
             password=password   
@@ -74,8 +72,6 @@ def register():
 
         db.session.add(new_user)
         db.session.commit()
-
-        print("User information saved!")
 
         return redirect(url_for("login"))
 
@@ -103,7 +99,6 @@ def login():
 
         else:
             session["user_id"] = user.id
-            print(f"the current user id is: {session.get('user_id')}")
             return redirect(url_for("dashboard"))
         
     return render_template("login.html")
