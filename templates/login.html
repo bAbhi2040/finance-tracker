@@ -1,3 +1,12 @@
+<head>
+    <title>Personal Finance App</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
 <div class="container">
     <h1>Login</h1>
 </div>
@@ -17,6 +26,6 @@
 
 <div class="section">
     {% if error %}
-        <p>{{ error }}</p>
+        <p class="error">{{ error }}</p>
     {% endif %}
 </div>

@@ -1,34 +1,79 @@
-<h1>Dashboard</h1>
+<head>
+    <title>Personal Finance App</title>
 
-<p>Welcome {{ user.username }}, to your finance dashboard!</p>
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
 
-<a href="/add_transaction">
-    Add Transaction
-</a>
+<div class="container">
+
+    <h1>Dashboard</h1>
+
+    <p>Welcome {{ user.username }}, to your finance dashboard!</p>
+
+</div>
+
+<div class="section">
+
+    <a href="/add_transaction">
+        Add Transaction
+    </a>
+
+</div>
 
 <br><br>
 
 {% for transaction in transactions %}
 
-    <p>
-        {{ transaction.transaction_type }}
+    <div class="transaction">
+
+        <strong>{{ transaction.transaction_type }}</strong>
+
         -
         ${{ transaction.amount }}
+
         -
         {{ transaction.category }}
+
         -
         {{ transaction.description }}
-    </p>
+
+    </div>
 
 {% endfor %}
 
-<h2>Balance: ${{ balance }}</h2>
-<h3>Income Total: ${{ income_total }}</h2>
-<h3>Expense Total: ${{ expense_total }}</h2>
-<h3>Total Transactions: {{ transaction_count }}</h3>
+<div class="stats">
+
+    <div class="card">
+        <h3>Balance</h3>
+        <p>{{ balance }}</p>
+    </div>
+
+    <div class="card">
+        <h3>Income</h3>
+        <p>{{ income_total }}</p>
+    </div>
+
+    <div class="card">
+        <h3>Expensees</h3>
+        <p>{{ expense_total }}</p>
+    </div>
+
+    <div class="card">
+        <h3>Transaction</h3>
+        <p>{{ transaction_count }}</p>
+    </div>
+
+</div>
 
 <br><br>
 
-<a href="/logout">
-    Logout
-</a>
+<div class="section">
+
+    <a href="/logout">
+        Logout
+    </a>
+
+</div>
