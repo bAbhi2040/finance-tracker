@@ -132,7 +132,7 @@ def dashboard():
         income_total=income_total,
         expense_total=expense_total,
         transaction_count=transaction_count,
-        balance=balance
+        balance=round(balance, 2)
     )
 
 @app.route("/logout")
@@ -167,7 +167,22 @@ def add_transaction():
     
     return render_template("add_transaction.html")
 
+@app.route("/delete_transaction/<int:transaction_id>")
+def delete_transaction(transaction_id):
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+    
+    transaction = Transaction.query.get(transaction_id)
 
+    if not transaction:
+        return redirect(url_for("dashboard"))
+
+    if transaction.user_id == session["user_id"]:
+        db.session.delete(transaction)
+        db.session.commit()
+
+    return redirect(url_for("dashboard"))
+        
 if __name__ == "__main__":  
     with app.app_context(): 
         db.create_all()
