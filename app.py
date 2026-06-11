@@ -182,6 +182,23 @@ def delete_transaction(transaction_id):
         db.session.commit()
 
     return redirect(url_for("dashboard"))
+
+@app.route("/edit_transaction/<int:transaction_id>", methods=["GET", "POST"])
+def edit_transaction(transaction_id):
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+    
+    transaction = Transaction.query.get(transaction_id)
+
+    if not transaction:
+        return redirect(url_for("dashboard"))
+    
+    if transaction.user_id == session["user_id"]:
+        return render_template(
+            "edit_transaction.html",
+            transaction=transaction
+        )
+
         
 if __name__ == "__main__":  
     with app.app_context(): 

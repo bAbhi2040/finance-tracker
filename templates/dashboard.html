@@ -8,47 +8,55 @@
 </head>
 
 <div class="container">
-
     <h1>Dashboard</h1>
 
     <p>Welcome {{ user.username }}, to your finance dashboard!</p>
-
 </div>
 
 <div class="section">
-
     <a href="/add_transaction">
         Add Transaction
     </a>
-
 </div>
 
 <br><br>
 
 {% for transaction in transactions %}
-
     <div class="transaction">
+        <div class="transaction_header">
+            <span class="transaction_type
+                {% if transaction.transaction_type == 'Income' %}
+                    income
+                {% else %}
+                    expense
+                {% endif %}
+            ">
+                {{ transaction.transaction_type }}
+            </span>
 
-        <strong>{{ transaction.transaction_type }}</strong>
+            <a class="delete_button"
+                href="/delete_transaction/{{ transaction.id }}">
+                ✕
+            </a>
+        </div>
 
-        -
-        ${{ transaction.amount }}
+        <div class="transaction_details">
+            <span class="amount_badge">
+                ${{ transaction.amount }}
+            </span>
 
-        -
-        {{ transaction.category }}
+            <span class="category_badge">
+                {{ transaction.category }}
+            </span>
+        </div>
 
-        -
-        {{ transaction.description }}
-
-        -
-        <a href="/delete_transaction/{{ transaction.id }}">Delete</a>
-
+        <p class="description">
+            {{ transaction.description }}
+        </p>
     </div>
-
 {% endfor %}
 
 <div class="stats">
-
     <div class="card">
         <h3>Balance</h3>
         <p>{{ balance }}</p>
@@ -68,15 +76,12 @@
         <h3>Transaction</h3>
         <p>{{ transaction_count }}</p>
     </div>
-
 </div>
 
 <br><br>
 
 <div class="section">
-
     <a href="/logout">
         Logout
     </a>
-
 </div>
