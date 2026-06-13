@@ -18,9 +18,15 @@
         <br><br>
 
         <input type="password" name="password" placeholder="Password">
-        
+
         <br><br>
 
         <button type="submit">Create Account</button>
     </form>
+</div>
+
+<div class="section">
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
 </div>

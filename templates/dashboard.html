@@ -34,6 +34,10 @@
                 {{ transaction.transaction_type }}
             </span>
 
+            <a href="/edit_transaction/{{ transaction.id }}">
+                Edit
+            </a>
+
             <a class="delete_button"
                 href="/delete_transaction/{{ transaction.id }}">
                 ✕
