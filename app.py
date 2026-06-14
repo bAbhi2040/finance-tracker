@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import (generate_password_hash, check_password_hash)
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "secret-key"
@@ -57,11 +58,29 @@ def register():
         username = request.form["username"]
         password = request.form["password"]
 
+        hashed_password = generate_password_hash(password)
+
         new_user = User(
             username=username,
-            password=password   
+            password=hashed_password   
         )
 
+        if not username:
+            return render_template(
+                "register.html",
+                error="Username can't be blank"
+            )
+        if not password:
+            return render_template(
+                "register.html",
+                error="Password can't be blank"
+            )
+        if len(password) < 8 or len(password) > 30:
+            return render_template(
+                "register.html",
+                error="Password must be between 8 to 30 characters"
+            )
+        
         existing_user = User.query.filter_by(username=username).first()
         if existing_user:
             return render_template(
@@ -88,7 +107,7 @@ def login():
                 "login.html",
                 error="User not found"
             )
-        elif user.password != password:
+        elif not check_password_hash(user.password, password):
             return render_template(
                 "login.html",
                 error="Incorrect password"
@@ -103,7 +122,7 @@ def dashboard():
     if "user_id" not in session:
         return redirect(url_for("login"))  
     user = User.query.get(session["user_id"])
-    transactions = Transaction.query.filter_by(user_id=session["user_id"]).all()
+    transactions = Transaction.query.filter_by(user_id=session["user_id"]).order_by(Transaction.id.desc()).all()
 
     income_total = 0
     expense_total = 0
@@ -121,8 +140,8 @@ def dashboard():
         "dashboard.html",
         user=user,
         transactions=transactions,
-        income_total=income_total,
-        expense_total=expense_total,
+        income_total=round(income_total, 2),
+        expense_total=round(expense_total, 2),
         transaction_count=transaction_count,
         balance=round(balance, 2)
     )
@@ -141,7 +160,18 @@ def add_transaction():
         category = request.form["category"]
         description = request.form["description"]
         transaction_type = request.form["transaction_type"]
-        
+
+        if amount <= 0:
+            return render_template(
+            "add_transaction.html",
+            error="The entered amount must be greater than 0"
+        )
+        if not description:
+            return render_template(
+                "add_transaction.html",
+                error="Must have a description"
+            )
+
         new_transaction = Transaction(
             amount=amount,
             category=category,
@@ -179,17 +209,35 @@ def edit_transaction(transaction_id):
         return redirect(url_for("dashboard"))   
     if transaction.user_id == session["user_id"]:
         if request.method == "POST":
-            transaction.amount = float(request.form["amount"])
-            transaction.category = request.form["category"]
-            transaction.description = request.form["description"]
-            transaction.transaction_type = request.form["transaction_type"]
+            amount = float(request.form["amount"])
+            category = request.form["category"]
+            description = request.form["description"]
+            transaction_type = request.form["transaction_type"]
+
+            if amount <= 0:
+                return render_template(
+                "edit_transaction.html",
+                transaction=transaction,
+                error="The entered amount must be greater than 0"
+                )
+            if not description:
+                return render_template(
+                    "edit_transaction.html",
+                    transaction=transaction,
+                    error="Must have a description"
+                )
+            
+            transaction.amount = amount
+            transaction.category = category
+            transaction.description = description
+            transaction.transaction_type = transaction_type
 
             db.session.commit()
 
             return redirect(url_for("dashboard"))
         return render_template(
             "edit_transaction.html",
-            transaction=transaction,
+            transaction=transaction
             )
     else:
         return redirect(url_for("dashboard"))
@@ -198,6 +246,5 @@ if __name__ == "__main__":
     with app.app_context(): 
         db.create_all()
         for user in User.query.all():
-            print(user.username)
-        
+            print(user.username)   
     app.run(debug=True)
