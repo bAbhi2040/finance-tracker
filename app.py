@@ -155,7 +155,9 @@ def dashboard():
         income_total=round(income_total, 2),
         expense_total=round(expense_total, 2),
         transaction_count=transaction_count,
-        balance=round(balance, 2)
+        balance=round(balance, 2),
+        filter_option=filter_option,
+        search_term=search_term
     )
 
 @app.route("/logout")

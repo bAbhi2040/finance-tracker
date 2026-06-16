@@ -21,21 +21,42 @@
 
 <br><br>
 
-<form method="GET">
+<form method="GET" class="filter_bar">
     <select name="filter_option">
-        <option>All</option>
-        <option>Income</option>
-        <option>Expenses</option>
+        <option
+            value="All"
+            {% if filter_option == "All" %}
+                selected
+            {% endif %}
+        >
+            All
+        </option>
+        <option
+            value="Income"
+            {% if filter_option == "Income" %}
+                selected
+            {% endif %}
+        >
+            Income
+        </option>
+        <option
+            value="Expenses"
+            {% if filter_option == "Expenses" %}
+                selected
+            {% endif %}
+        >
+            Expenses
+        </option>
     </select>
 
     <button>
         Filter
     </button>
-</form>
 
-<form method="GET">
     <input
+        type="text"
         name="search"
+        value="{{ search_term }}"
         placeholder="Search descriptions..."
     >
 
@@ -44,46 +65,50 @@
     </button>
 </form>
 
-{% for transaction in transactions %}
-    <div class="transaction">
-        <div class="transaction_header">
-            <span class="transaction_type
-                {% if transaction.transaction_type == 'Income' %}
-                    income
-                {% else %}
-                    expense
-                {% endif %}
-            ">
-                {{ transaction.transaction_type }}
-            </span>
+{% if transactions %}
+    {% for transaction in transactions %}
+        <div class="transaction">
+            <div class="transaction_header">
+                <span class="transaction_type
+                    {% if transaction.transaction_type == 'Income' %}
+                        income
+                    {% else %}
+                        expense
+                    {% endif %}
+                ">
+                    {{ transaction.transaction_type }}
+                </span>
 
-            <a href="/edit_transaction/{{ transaction.id }}">
-                Edit
-            </a>
+                <a href="/edit_transaction/{{ transaction.id }}">
+                    Edit
+                </a>
 
-            <a class="delete_button"
-                href="/delete_transaction/{{ transaction.id }}">
-                ✕
-            </a>
+                <a class="delete_button"
+                    href="/delete_transaction/{{ transaction.id }}">
+                    ✕
+                </a>
+            </div>
+
+            <div class="transaction_details">
+                <span class="amount_badge">
+                    ${{ transaction.amount }}
+                </span>
+
+                <div class="divider"></div>
+
+                <span class="category_badge">
+                    {{ transaction.category }}
+                </span>
+            </div>
+
+            <p class="description">
+                {{ transaction.description }}
+            </p>
         </div>
-
-        <div class="transaction_details">
-            <span class="amount_badge">
-                ${{ transaction.amount }}
-            </span>
-
-            <div class="divider"></div>
-
-            <span class="category_badge">
-                {{ transaction.category }}
-            </span>
-        </div>
-
-        <p class="description">
-            {{ transaction.description }}
-        </p>
-    </div>
-{% endfor %}
+    {% endfor %}
+{% else %}
+        <p>No matching transactions</p>
+{% endif %}
 
 <div class="stats">
     <div class="card">
