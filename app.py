@@ -122,7 +122,19 @@ def dashboard():
     if "user_id" not in session:
         return redirect(url_for("login"))  
     user = User.query.get(session["user_id"])
-    transactions = Transaction.query.filter_by(user_id=session["user_id"]).order_by(Transaction.id.desc()).all()
+    query = Transaction.query.filter_by(user_id=session["user_id"])
+
+    filter_option = request.args.get("filter_option", "All")
+    if filter_option == "Income":
+        query = query.filter_by(transaction_type="Income")
+    elif filter_option == "Expenses":
+        query = query.filter_by(transaction_type="Expense")
+
+    search_term = request.args.get("search", "")
+    if search_term:
+        query = query.filter(Transaction.description.contains(search_term))
+
+    transactions = query.order_by(Transaction.id.desc()).all()
 
     income_total = 0
     expense_total = 0

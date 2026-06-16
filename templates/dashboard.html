@@ -21,6 +21,29 @@
 
 <br><br>
 
+<form method="GET">
+    <select name="filter_option">
+        <option>All</option>
+        <option>Income</option>
+        <option>Expenses</option>
+    </select>
+
+    <button>
+        Filter
+    </button>
+</form>
+
+<form method="GET">
+    <input
+        name="search"
+        placeholder="Search descriptions..."
+    >
+
+    <button type="submit">
+        Search
+    </button>
+</form>
+
 {% for transaction in transactions %}
     <div class="transaction">
         <div class="transaction_header">
@@ -48,6 +71,8 @@
             <span class="amount_badge">
                 ${{ transaction.amount }}
             </span>
+
+            <div class="divider"></div>
 
             <span class="category_badge">
                 {{ transaction.category }}
