@@ -60,6 +60,41 @@
         placeholder="Search descriptions..."
     >
 
+    <select name="date_search">
+        <option
+            value="Any"
+            {% if date_search == "Any" %}
+                selected
+            {% endif %}
+        >
+            Any
+        </option>
+        <option
+            value="Today"
+            {% if date_search == "Today" %}
+                selected
+            {% endif %}
+        >
+            Today
+        </option>
+        <option
+            value="This month"
+            {% if date_search == "This month" %}
+                selected
+            {% endif %}
+        >
+            This month
+        </option>
+        <option
+            value="This year"
+            {% if date_search == "This year" %}
+                selected
+            {% endif %}
+        >
+            This year
+        </option>
+    </select>
+
     <button type="submit">
         Search
     </button>
@@ -106,8 +141,10 @@
             </p>
         </div>
     {% endfor %}
-{% else %}
+{% elif search_term or filter_option or date_search != "All" %}
         <p>No matching transactions</p>
+{% else %}
+        <p>No transactions yet, add your first transaction!</p>
 {% endif %}
 
 <div class="stats">
@@ -130,6 +167,12 @@
         <h3>Transaction</h3>
         <p>{{ transaction_count }}</p>
     </div>
+</div>
+
+<div>
+    {% for category, total in sorted_categories %}
+        <p>{{ category }}: ${{ total }}</p>
+    {% endfor %}
 </div>
 
 <br><br>

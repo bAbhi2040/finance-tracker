@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import (generate_password_hash, check_password_hash)
+from datetime import date
+from sqlalchemy import extract
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "secret-key"
@@ -47,6 +49,12 @@ class Transaction(db.Model):
         db.String(20),
         nullable=False
     )
+    transaction_date = db.Column(
+        db.Date,
+        nullable=False
+    )
+
+
 
 @app.route("/")
 def home():
@@ -68,24 +76,28 @@ def register():
         if not username:
             return render_template(
                 "register.html",
-                error="Username can't be blank"
+                error="Username can't be blank",
+                form = request.form
             )
         if not password:
             return render_template(
                 "register.html",
-                error="Password can't be blank"
+                error="Password can't be blank",
+                form = request.form
             )
         if len(password) < 8 or len(password) > 30:
             return render_template(
                 "register.html",
-                error="Password must be between 8 to 30 characters"
+                error="Password must be between 8 to 30 characters",
+                form = request.form
             )
         
         existing_user = User.query.filter_by(username=username).first()
         if existing_user:
             return render_template(
                 "register.html",
-                error="Username already exists"
+                error="Username already exists",
+                form = request.form
             )
 
         db.session.add(new_user)
@@ -105,12 +117,14 @@ def login():
         if not user:
             return render_template(
                 "login.html",
-                error="User not found"
+                error="User not found",
+                form = request.form
             )
         elif not check_password_hash(user.password, password):
             return render_template(
                 "login.html",
-                error="Incorrect password"
+                error="Incorrect password",
+                form = request.form
             )
         else:
             session["user_id"] = user.id
@@ -134,6 +148,17 @@ def dashboard():
     if search_term:
         query = query.filter(Transaction.description.contains(search_term))
 
+    today = date.today()
+    date_search = request.args.get("date_search", "Any")
+    if date_search == "Today":
+        query = query.filter(Transaction.transaction_date == today)
+    elif date_search == "This month":
+        query = query.filter(extract('month', Transaction.transaction_date) == today.month,
+                             extract('year', Transaction.transaction_date) == today.year
+                             )
+    elif date_search == "This year":
+        query = query.filter(extract('year', Transaction.transaction_date) == today.year)
+
     transactions = query.order_by(Transaction.id.desc()).all()
 
     income_total = 0
@@ -148,6 +173,18 @@ def dashboard():
     balance = income_total - expense_total
     transaction_count = len(transactions)
 
+    category_total = {}
+
+    for transaction in transactions:
+        if transaction.category not in category_total:
+            category_total[transaction.category] = 0
+        category_total[transaction.category] += transaction.amount
+    sorted_categories = sorted(
+        category_total.items(),
+        key=lambda item: item[1],
+        reverse=True
+    )
+
     return render_template(
         "dashboard.html",
         user=user,
@@ -157,7 +194,9 @@ def dashboard():
         transaction_count=transaction_count,
         balance=round(balance, 2),
         filter_option=filter_option,
-        search_term=search_term
+        search_term=search_term,
+        date_search=date_search,
+        sorted_categories=sorted_categories
     )
 
 @app.route("/logout")
@@ -174,16 +213,25 @@ def add_transaction():
         category = request.form["category"]
         description = request.form["description"]
         transaction_type = request.form["transaction_type"]
-
+        date_string = request.form["date"]
+        
         if amount <= 0:
             return render_template(
             "add_transaction.html",
-            error="The entered amount must be greater than 0"
+            error="The entered amount must be greater than 0",
+            form = request.form
         )
         if not description:
             return render_template(
                 "add_transaction.html",
-                error="Must have a description"
+                error="Must have a description",
+                form = request.form
+            )
+        if not date_string:
+            return render_template(
+                "add_transaction.html",
+                error="Must have a date",
+                form = request.form
             )
 
         new_transaction = Transaction(
@@ -191,7 +239,8 @@ def add_transaction():
             category=category,
             description=description,
             user_id=session["user_id"],
-            transaction_type=transaction_type
+            transaction_type=transaction_type,
+            transaction_date=date.fromisoformat(request.form["date"])
         )
 
         db.session.add(new_transaction)
@@ -232,13 +281,15 @@ def edit_transaction(transaction_id):
                 return render_template(
                 "edit_transaction.html",
                 transaction=transaction,
-                error="The entered amount must be greater than 0"
+                error="The entered amount must be greater than 0",
+                form = request.form
                 )
             if not description:
                 return render_template(
                     "edit_transaction.html",
                     transaction=transaction,
-                    error="Must have a description"
+                    error="Must have a description",
+                    form = request.form
                 )
             
             transaction.amount = amount
