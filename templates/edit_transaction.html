@@ -16,7 +16,7 @@
                 type="number"
                 step="0.01"
                 name="amount"
-                value="{{ transaction.amount}}"
+                value="{{ transaction.amount }}"
             >
 
             <br><br>
@@ -91,6 +91,15 @@
                     Expense
                 </option>
             </select>
+
+            <br><br>
+
+            <input
+                type="date"
+                name="date"
+                placeholder="Date"
+                value="{{ transaction.transaction_date.isoformat() }}"
+            >
 
             <br><br>
 

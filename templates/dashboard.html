@@ -14,51 +14,56 @@
 </div>
 
 <div class="section">
-    <a href="/add_transaction">
-        Add Transaction
+    <a href="/add_transaction" class="primary_action">
+        + Add Transaction
     </a>
 </div>
 
 <br><br>
 
 <form method="GET" class="filter_bar">
-    <select name="filter_option">
-        <option
-            value="All"
-            {% if filter_option == "All" %}
-                selected
-            {% endif %}
-        >
-            All
-        </option>
-        <option
-            value="Income"
-            {% if filter_option == "Income" %}
-                selected
-            {% endif %}
-        >
-            Income
-        </option>
-        <option
-            value="Expenses"
-            {% if filter_option == "Expenses" %}
-                selected
-            {% endif %}
-        >
-            Expenses
-        </option>
-    </select>
-
-    <button>
-        Filter
-    </button>
-
     <input
         type="text"
         name="search"
         value="{{ search_term }}"
         placeholder="Search descriptions..."
+        class="search_input"
     >
+
+    <div class="filter_chips">
+        <input
+            type="radio"
+            id="all"
+            name="filter_option"
+            value="All"
+            {% if filter_option == "All" %}
+                checked
+            {% endif %}
+        >
+        <label for="all">All</label>
+
+        <input
+            type="radio"
+            id="income"
+            name="filter_option"
+            value="Income"
+            {% if filter_option == "Income" %}
+                checked
+            {% endif %}
+        >
+        <label for="income">Income</label>
+
+        <input
+            type="radio"
+            id="expenses"
+            name="filter_option"
+            value="Expenses"
+            {% if filter_option == "Expenses" %}
+                checked
+            {% endif %}
+        >
+        <label for="expenses">Expenses</label>
+    </div>
 
     <select name="date_search">
         <option
@@ -98,6 +103,10 @@
     <button type="submit">
         Search
     </button>
+
+    <a href="{{ url_for('dashboard') }}" class="clear_button">
+        Clear
+    </a>
 </form>
 
 {% if transactions %}
@@ -114,14 +123,21 @@
                     {{ transaction.transaction_type }}
                 </span>
 
-                <a href="/edit_transaction/{{ transaction.id }}">
-                    Edit
-                </a>
+                <div class="transaction_actions">
+                    <a 
+                        href="/edit_transaction/{{ transaction.id }}"
+                        class="edit_button"
+                    >
+                        Edit
+                    </a>
 
-                <a class="delete_button"
-                    href="/delete_transaction/{{ transaction.id }}">
-                    ✕
-                </a>
+                    <a 
+                        class="delete_button"
+                        href="/delete_transaction/{{ transaction.id }}"    
+                    >
+                        ✕
+                    </a>
+                </div>
             </div>
 
             <div class="transaction_details">
@@ -139,6 +155,12 @@
             <p class="description">
                 {{ transaction.description }}
             </p>
+            
+            <div class="transaction_meta">
+                <span class="transaction_date">
+                    {{ transaction.transaction_date.strftime('%b %d %Y') }}
+                </span>
+            </div>
         </div>
     {% endfor %}
 {% elif search_term or filter_option or date_search != "All" %}

@@ -276,6 +276,8 @@ def edit_transaction(transaction_id):
             category = request.form["category"]
             description = request.form["description"]
             transaction_type = request.form["transaction_type"]
+            date_string = request.form["date"]
+            transaction_date = date.fromisoformat(date_string)
 
             if amount <= 0:
                 return render_template(
@@ -296,6 +298,7 @@ def edit_transaction(transaction_id):
             transaction.category = category
             transaction.description = description
             transaction.transaction_type = transaction_type
+            transaction.transaction_date = transaction_date
 
             db.session.commit()
 
