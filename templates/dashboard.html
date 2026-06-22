@@ -237,31 +237,12 @@
     </div>
 </div>
 
-<div>
-    {% for category, total in sorted_categories %}
-        <p>{{ category }}: ${{ "%.2f"|format(total) }}</p>
-    {% endfor %}
-</div>
-
 <br><br>
-
-<h3>Spending Breakdown</h3>
-
-<ul>
-    {% for category, percent in category_percents.items() %}
-        <li>{{ category }}: {{ percent }}</li>
-    {% endfor %}
-</ul>
-
-<br><br>
-
-<li>{{ expense_category_list }}</li>
-<li>{{ expense_amount_list }}</li>
 
 <div class="spending_breakdown">
     <canvas id="expense_chart"
-            data-labels = '{{ expense_category_list | tojson }}'
-            data-values = '{{ expense_amount_list | tojson }}'>
+            data-labels = '{{ category_list_percents | tojson }}'
+            data-values = '{{ percent_list_percents | tojson }}'>
             
     </canvas>
 </div>
@@ -279,7 +260,7 @@
         data: {
             labels: labels,
             datasets: [{
-                label: '% of total spending',
+                label: ' % of total spending',
                 data: values,
                 hoverOffset: 4
             }]

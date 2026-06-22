@@ -199,10 +199,15 @@ def dashboard():
             expense_category[transaction.category] += transaction.amount
     total_expenses = sum(expense_category.values())
 
+    category_list_percents = []
+    percent_list_percents = []
     category_percents = {}
     if expense_total != 0:
         for category, amount in expense_category.items():
             category_percents[category] = round((amount / total_expenses) * 100, 1)
+        for category, percent in category_percents.items():
+            category_list_percents.append(category)
+            percent_list_percents.append(round(percent, 2))
 
     expense_category_list = []
     expense_amount_list = []
@@ -224,8 +229,8 @@ def dashboard():
         sorted_categories=sorted_categories,
         sort_by=sort_by,
         category_percents=category_percents,
-        expense_amount_list=expense_amount_list,
-        expense_category_list=expense_category_list
+        percent_list_percents=percent_list_percents,
+        category_list_percents=category_list_percents
     )
 
 @app.route("/logout")
