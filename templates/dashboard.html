@@ -260,8 +260,9 @@
 
 <div class="spending_breakdown">
     <canvas id="expense_chart"
-            data-labels = "{{ expense_category_list | tojson }}"
-            data-values = "{{ expense_amount_list | tojson }}">
+            data-labels = '{{ expense_category_list | tojson }}'
+            data-values = '{{ expense_amount_list | tojson }}'>
+            
     </canvas>
 </div>
 
@@ -269,9 +270,21 @@
 
 <script>
     const canvasChart = document.getElementById("expense_chart");
-    const labels = JSON.parse(canvasChart.dataset.labels)
-    const values = JSON.parse(canvasChart.dataset.values)
+    const labels = JSON.parse(canvasChart.dataset.labels);
+    const values = JSON.parse(canvasChart.dataset.values);
+    const ctx = canvasChart.getContext('2d');
 
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '% of total spending',
+                data: values,
+                hoverOffset: 4
+            }]
+        }});
+       
     console.log(labels);
     console.log(values);
     console.log(canvasChart);
