@@ -54,8 +54,6 @@ class Transaction(db.Model):
         nullable=False
     )
 
-
-
 @app.route("/")
 def home():
     return render_template("home.html")
@@ -159,7 +157,15 @@ def dashboard():
     elif date_search == "This year":
         query = query.filter(extract('year', Transaction.transaction_date) == today.year)
 
-    transactions = query.order_by(Transaction.id.desc()).all()
+    sort_by = request.args.get("sort_by")
+    if sort_by == "Oldest":
+        transactions = query.order_by(Transaction.transaction_date.asc()).all()
+    elif sort_by == "Highest Amount":
+        transactions = query.order_by(Transaction.amount.desc()).all()
+    elif sort_by == "Lowest Amount":
+        transactions = query.order_by(Transaction.amount.asc()).all()
+    else:
+        transactions = query.order_by(Transaction.transaction_date.desc()).all()
 
     income_total = 0
     expense_total = 0
@@ -185,18 +191,41 @@ def dashboard():
         reverse=True
     )
 
+    expense_category = {}
+    for transaction in transactions:
+        if transaction.transaction_type == "Expense":
+            if transaction.category not in expense_category:
+                expense_category[transaction.category] = 0
+            expense_category[transaction.category] += transaction.amount
+    total_expenses = sum(expense_category.values())
+
+    category_percents = {}
+    if expense_total != 0:
+        for category, amount in expense_category.items():
+            category_percents[category] = round((amount / total_expenses) * 100, 1)
+
+    expense_category_list = []
+    expense_amount_list = []
+    for category, amount in expense_category.items():
+        expense_category_list.append(category)
+        expense_amount_list.append(round(amount, 2))
+
     return render_template(
         "dashboard.html",
         user=user,
         transactions=transactions,
-        income_total=round(income_total, 2),
-        expense_total=round(expense_total, 2),
+        income_total=income_total,
+        expense_total=expense_total,
         transaction_count=transaction_count,
-        balance=round(balance, 2),
+        balance=balance,
         filter_option=filter_option,
         search_term=search_term,
         date_search=date_search,
-        sorted_categories=sorted_categories
+        sorted_categories=sorted_categories,
+        sort_by=sort_by,
+        category_percents=category_percents,
+        expense_amount_list=expense_amount_list,
+        expense_category_list=expense_category_list
     )
 
 @app.route("/logout")
@@ -312,7 +341,5 @@ def edit_transaction(transaction_id):
         
 if __name__ == "__main__":  
     with app.app_context(): 
-        db.create_all()
-        for user in User.query.all():
-            print(user.username)   
+        db.create_all() 
     app.run(debug=True)

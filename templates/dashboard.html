@@ -109,6 +109,52 @@
     </a>
 </form>
 
+<form method="GET" class="sort_bar">
+
+    <select name="sort_by">
+        <option value="" selected disabled>
+                    Sort By
+                </option>
+        <option
+            value="Newest"
+            {% if sort_by == "Newest" %}
+                selected
+            {% endif %}
+        >
+            Newest
+        </option>
+        <option
+            value="Oldest"
+            {% if sort_by == "Oldest" %}
+                selected
+            {% endif %}
+        >
+            Oldest
+        </option>
+        <option
+            value="Highest Amount"
+            {% if sort_by == "Highest Amount" %}
+                selected
+            {% endif %}
+        >
+            Highest Amount
+        </option>
+        <option
+            value="Lowest Amount"
+            {% if sort_by == "Lowest Amount" %}
+                selected
+            {% endif %}
+        >
+            Lowest Amount
+        </option>
+    </select>
+
+    <button type="submit">
+        Apply
+    </button>
+
+</form>
+
 {% if transactions %}
     {% for transaction in transactions %}
         <div class="transaction">
@@ -172,17 +218,17 @@
 <div class="stats">
     <div class="card">
         <h3>Balance</h3>
-        <p>${{ balance }}</p>
+        <p>${{ "%.2f"|format(balance) }}</p>
     </div>
 
     <div class="card">
         <h3>Income</h3>
-        <p>${{ income_total }}</p>
+        <p>${{ "%.2f"|format(income_total) }}</p>
     </div>
 
     <div class="card">
         <h3>Expenses</h3>
-        <p>${{ expense_total }}</p>
+        <p>${{ "%.2f"|format(expense_total) }}</p>
     </div>
 
     <div class="card">
@@ -193,11 +239,43 @@
 
 <div>
     {% for category, total in sorted_categories %}
-        <p>{{ category }}: ${{ total }}</p>
+        <p>{{ category }}: ${{ "%.2f"|format(total) }}</p>
     {% endfor %}
 </div>
 
 <br><br>
+
+<h3>Spending Breakdown</h3>
+
+<ul>
+    {% for category, percent in category_percents.items() %}
+        <li>{{ category }}: {{ percent }}</li>
+    {% endfor %}
+</ul>
+
+<br><br>
+
+<li>{{ expense_category_list }}</li>
+<li>{{ expense_amount_list }}</li>
+
+<div class="spending_breakdown">
+    <canvas id="expense_chart"
+            data-labels = "{{ expense_category_list | tojson }}"
+            data-values = "{{ expense_amount_list | tojson }}">
+    </canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const canvasChart = document.getElementById("expense_chart");
+    const labels = JSON.parse(canvasChart.dataset.labels)
+    const values = JSON.parse(canvasChart.dataset.values)
+
+    console.log(labels);
+    console.log(values);
+    console.log(canvasChart);
+</script>
 
 <div class="section">
     <a href="/logout">
