@@ -57,6 +57,13 @@
                 >
                     Healthcare
                 </option>
+                <option value="Other"
+                    {% if transaction.category == "Other" %}
+                        selected
+                    {% endif %}
+                >
+                    Other
+                </option>
                 <option value="Income"
                     {% if transaction.category == "Income" %}
                         selected

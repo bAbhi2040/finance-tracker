@@ -203,17 +203,37 @@ def dashboard():
     percent_list_percents = []
     category_percents = {}
     if expense_total != 0:
-        for category, amount in expense_category.items():
-            category_percents[category] = round((amount / total_expenses) * 100, 1)
+        for category, percent in expense_category.items():
+            category_percents[category] = round((percent / total_expenses) * 100, 1)
         for category, percent in category_percents.items():
             category_list_percents.append(category)
-            percent_list_percents.append(round(percent, 2))
+            percent_list_percents.append(round(percent, 1))
 
     expense_category_list = []
     expense_amount_list = []
     for category, amount in expense_category.items():
         expense_category_list.append(category)
-        expense_amount_list.append(round(amount, 2))
+        expense_amount_list.append(amount)
+
+    recommended_spending = {
+        "Housing": 30,
+        "Food": 15,
+        "Transportation": 10,
+        "Entertainment": 10,
+        "Savings": 20,
+        "Other": 15
+    }
+
+    recommended_category_list_percents = []
+    recommended_percent_list_percents = []
+    for category, percent in recommended_spending.items():
+        recommended_category_list_percents.append(category)
+        recommended_percent_list_percents.append(round(percent, 1))
+
+    percent_differences = {}
+    for category, percent in category_percents.items():
+        percent_differences[category] = round((category_percents[category] - recommended_spending[category]), 1)
+        print(percent_differences)
 
     return render_template(
         "dashboard.html",
@@ -230,7 +250,9 @@ def dashboard():
         sort_by=sort_by,
         category_percents=category_percents,
         percent_list_percents=percent_list_percents,
-        category_list_percents=category_list_percents
+        category_list_percents=category_list_percents,
+        recommended_category_list_percents=recommended_category_list_percents,
+        recommended_percent_list_percents=recommended_percent_list_percents
     )
 
 @app.route("/logout")
