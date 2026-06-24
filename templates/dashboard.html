@@ -208,6 +208,11 @@
             </div>
         </div>
     {% endfor %}
+
+    <br><br>
+    <a href="{{ url_for('dashboard', cursor=next_cursor) }}">Show More</a>
+    <br><br>
+
 {% elif search_term or filter_option or date_search != "All" %}
         <p>No matching transactions</p>
 {% else %}

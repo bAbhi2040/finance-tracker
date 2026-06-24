@@ -159,13 +159,22 @@ def dashboard():
 
     sort_by = request.args.get("sort_by")
     if sort_by == "Oldest":
-        transactions = query.order_by(Transaction.transaction_date.asc()).all()
+        query = query.order_by(Transaction.transaction_date.asc())
     elif sort_by == "Highest Amount":
-        transactions = query.order_by(Transaction.amount.desc()).all()
+        query = query.order_by(Transaction.amount.desc())
     elif sort_by == "Lowest Amount":
-        transactions = query.order_by(Transaction.amount.asc()).all()
+        query = query.order_by(Transaction.amount.asc())
     else:
-        transactions = query.order_by(Transaction.transaction_date.desc()).all()
+        query = query.order_by(Transaction.transaction_date.desc())
+
+    cursor = request.args.get('cursor', type=int)
+    if cursor:
+        query = query.filter(Transaction.id < cursor)
+    transactions = query.order_by(Transaction.id.desc()).limit(5).all()
+    if transactions:
+        next_cursor = transactions[-1].id
+    else: 
+        next_cursor = None
 
     income_total = 0
     expense_total = 0
@@ -252,7 +261,8 @@ def dashboard():
         percent_list_percents=percent_list_percents,
         category_list_percents=category_list_percents,
         recommended_category_list_percents=recommended_category_list_percents,
-        recommended_percent_list_percents=recommended_percent_list_percents
+        recommended_percent_list_percents=recommended_percent_list_percents,
+        next_cursor=next_cursor
     )
 
 @app.route("/logout")
