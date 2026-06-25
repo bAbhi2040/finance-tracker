@@ -109,6 +109,10 @@
 </form>
 
 <form method="GET" class="sort_bar">
+    <input type="hidden" name="search" value="{{ search_term }}">
+    <input type="hidden" name="filter_option" value="{{ filter_option }}">
+    <input type="hidden" name="date_search" value="{{ date_search }}">
+    <input type="hidden" name="limit" value="{{ limit }}">
 
     <select name="sort_by">
         <option value="" selected disabled>
@@ -156,7 +160,7 @@
 
 {% if transactions %}
     {% for transaction in transactions %}
-        <div class="transaction">
+        <div class="transaction" id="transactions_container">
             <div class="transaction_header">
                 <span class="transaction_type
                     {% if transaction.transaction_type == 'Income' %}
@@ -210,8 +214,28 @@
     {% endfor %}
 
     <br><br>
-    <a href="{{ url_for('dashboard', cursor=next_cursor) }}">Show More</a>
+    <a href="{{ url_for('dashboard',
+        limit=next_limit,
+        filter_option=filter_option,
+        search=search_term,
+        date_search=date_search,
+        sort_by=sort_by
+    ) }}">
+        Show More
+    </a>
     <br><br>
+
+    <br><br>
+    <a href="{{ url_for('dashboard',
+        filter_option=filter_option,
+        search=search_term,
+        date_search=date_search,
+        sort_by=sort_by
+    ) }}">
+        Show All
+    </a>
+    <br><br>
+
 
 {% elif search_term or filter_option or date_search != "All" %}
         <p>No matching transactions</p>

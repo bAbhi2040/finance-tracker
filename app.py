@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import (generate_password_hash, check_password_hash)
 from datetime import date
@@ -167,30 +167,29 @@ def dashboard():
     else:
         query = query.order_by(Transaction.transaction_date.desc())
 
-    cursor = request.args.get('cursor', type=int)
-    if cursor:
-        query = query.filter(Transaction.id < cursor)
-    transactions = query.order_by(Transaction.id.desc()).limit(5).all()
-    if transactions:
-        next_cursor = transactions[-1].id
+    limit = request.args.get('limit', 5, type=int)
+    if limit:
+        transactions = query.order_by(Transaction.id.desc()).limit(limit).all()
+        next_limit = limit + 5
     else: 
-        next_cursor = None
+        transactions = query.order_by(Transaction.id.desc()).all()
 
+    transactions_analysis = Transaction.query.filter_by(user_id=session["user_id"]).all()
     income_total = 0
     expense_total = 0
 
-    for transaction in transactions:
+    for transaction in transactions_analysis:
         if transaction.transaction_type == "Income":
             income_total += transaction.amount
         elif transaction.transaction_type == "Expense":
             expense_total += transaction.amount
 
     balance = income_total - expense_total
-    transaction_count = len(transactions)
+    transaction_count = len(transactions_analysis)
 
     category_total = {}
 
-    for transaction in transactions:
+    for transaction in transactions_analysis:
         if transaction.category not in category_total:
             category_total[transaction.category] = 0
         category_total[transaction.category] += transaction.amount
@@ -201,7 +200,7 @@ def dashboard():
     )
 
     expense_category = {}
-    for transaction in transactions:
+    for transaction in transactions_analysis:
         if transaction.transaction_type == "Expense":
             if transaction.category not in expense_category:
                 expense_category[transaction.category] = 0
@@ -248,6 +247,7 @@ def dashboard():
         "dashboard.html",
         user=user,
         transactions=transactions,
+        transactions_analysis=transactions_analysis,
         income_total=income_total,
         expense_total=expense_total,
         transaction_count=transaction_count,
@@ -262,7 +262,7 @@ def dashboard():
         category_list_percents=category_list_percents,
         recommended_category_list_percents=recommended_category_list_percents,
         recommended_percent_list_percents=recommended_percent_list_percents,
-        next_cursor=next_cursor
+        next_limit=next_limit
     )
 
 @app.route("/logout")
