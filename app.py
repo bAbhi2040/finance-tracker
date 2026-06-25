@@ -167,12 +167,13 @@ def dashboard():
     else:
         query = query.order_by(Transaction.transaction_date.desc())
 
+    mode = request.args.get('mode', 'normal')
     limit = request.args.get('limit', 5, type=int)
-    if limit:
-        transactions = query.order_by(Transaction.id.desc()).limit(limit).all()
-        next_limit = limit + 5
-    else: 
+    if mode == 'all':
         transactions = query.order_by(Transaction.id.desc()).all()
+    elif limit: 
+        transactions = query.order_by(Transaction.id.desc()).limit(limit).all()
+    next_limit = limit + 5
 
     transactions_analysis = Transaction.query.filter_by(user_id=session["user_id"]).all()
     income_total = 0
@@ -262,7 +263,8 @@ def dashboard():
         category_list_percents=category_list_percents,
         recommended_category_list_percents=recommended_category_list_percents,
         recommended_percent_list_percents=recommended_percent_list_percents,
-        next_limit=next_limit
+        next_limit=next_limit,
+        mode=mode
     )
 
 @app.route("/logout")

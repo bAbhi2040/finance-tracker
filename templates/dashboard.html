@@ -216,6 +216,7 @@
     <br><br>
     <a href="{{ url_for('dashboard',
         limit=next_limit,
+        mode='normal',
         filter_option=filter_option,
         search=search_term,
         date_search=date_search,
@@ -227,12 +228,26 @@
 
     <br><br>
     <a href="{{ url_for('dashboard',
+        mode='all',
         filter_option=filter_option,
         search=search_term,
         date_search=date_search,
         sort_by=sort_by
     ) }}">
         Show All
+    </a>
+    <br><br>
+
+    <br><br>
+    <a href="{{ url_for('dashboard',
+        filter_option=filter_option,
+        search=search_term,
+        date_search=date_search,
+        sort_by=sort_by,
+        limit=5,
+        mode='normal'
+    ) }}">
+        Revert
     </a>
     <br><br>
 
