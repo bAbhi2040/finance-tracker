@@ -213,6 +213,7 @@
         </div>
     {% endfor %}
 
+<div class="pagination_actions">
     <br><br>
     <a href="{{ url_for('dashboard',
         limit=next_limit,
@@ -221,7 +222,7 @@
         search=search_term,
         date_search=date_search,
         sort_by=sort_by
-    ) }}">
+    ) }}" class="secondary_button">
         Show More
     </a>
     <br><br>
@@ -233,7 +234,7 @@
         search=search_term,
         date_search=date_search,
         sort_by=sort_by
-    ) }}">
+    ) }}" class="secondary_button">
         Show All
     </a>
     <br><br>
@@ -246,11 +247,11 @@
         sort_by=sort_by,
         limit=5,
         mode='normal'
-    ) }}">
+    ) }}" class="secondary_button">
         Revert
     </a>
     <br><br>
-
+</div>
 
 {% elif search_term or filter_option or date_search != "All" %}
         <p>No matching transactions</p>
@@ -314,6 +315,16 @@
     const values_recommended = JSON.parse(recommendedCanvasChart.dataset.values);
     const ctx = canvasChart.getContext('2d');
     const ctx_recommended = recommendedCanvasChart.getContext('2d');
+    const categoryColors = {
+        Food: "#2563eb",
+        Housing: "#10b981",
+        Transportation: "#f59e0b",
+        Entertainment: "#ef4444",
+        Healthcare: "#8b5cf6",
+        Other: "#06b6d4"
+    };
+    const backgroundColors = labels.map(label => categoryColors[label]);
+    const backgroundColorsRecommended = labels_recommended.map(label => categoryColors[label]);
     Chart.register(ChartDataLabels);
 
     new Chart(ctx, {
@@ -323,16 +334,7 @@
             datasets: [{
                 label: ' % of total spending',
                 data: values,
-                backgroundColor: [
-                            "#2563eb",
-                            "#10b981",
-                            "#f59e0b",
-                            "#ef4444",
-                            "#8b5cf6",
-                            "#06b6d4",
-                            "#ec4899",
-                            "#84cc16"
-                ],
+                backgroundColor: backgroundColors,
                 hoverOffset: 10,
                 borderWidth: 3,
                 borderColor: "#fff"
@@ -364,16 +366,7 @@
             datasets: [{
                 label: ' % of total spending',
                 data: values_recommended,
-                backgroundColor: [
-                            "#2563eb",
-                            "#10b981",
-                            "#f59e0b",
-                            "#ef4444",
-                            "#8b5cf6",
-                            "#06b6d4",
-                            "#ec4899",
-                            "#84cc16"
-                ],
+                backgroundColor: backgroundColorsRecommended,
                 hoverOffset: 10,
                 borderWidth: 3,
                 borderColor: "#fff"
@@ -398,6 +391,21 @@
         }
     });
 </script>
+
+<br><br>
+<div class="insights">
+
+    <h3>Financial Insights</h3>
+
+    {% for insight in analysis %}
+        <p>{{ insight }}</p>
+    {% endfor %}
+</div>
+
+<div class="financial_score">
+    <h2>Score: {{ score }}/100</h2>
+    <span>Financial Health Score</span>
+</div>
 
 <br><br>
 

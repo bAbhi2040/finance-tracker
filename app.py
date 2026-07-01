@@ -225,11 +225,11 @@ def dashboard():
         expense_amount_list.append(amount)
 
     recommended_spending = {
-        "Housing": 30,
-        "Food": 15,
-        "Transportation": 10,
+        "Housing": 35,
+        "Food": 20,
+        "Transportation": 15,
         "Entertainment": 10,
-        "Savings": 20,
+        "Healthcare": 5,
         "Other": 15
     }
 
@@ -240,9 +240,45 @@ def dashboard():
         recommended_percent_list_percents.append(round(percent, 1))
 
     percent_differences = {}
-    for category, percent in category_percents.items():
-        percent_differences[category] = round((category_percents[category] - recommended_spending[category]), 1)
-        print(percent_differences)
+    for category, percent in recommended_spending.items():
+        percent_differences[category] = round((category_percents.get(category, 0) - recommended_spending[category]), 1)
+       
+    score = 100
+    analysis = []
+    if transaction_count < 5:
+        score = 0
+        analysis.append("Add more than 5 transactions to begin seeing insights!")
+    elif income_total != 0:
+        savings_percent = ((income_total - expense_total) / income_total) * 100
+        for category, difference in percent_differences.items():
+            if abs(difference) <= 1:
+                insight = f"You are spending the recommended percent on {category}."
+            elif difference > 0:
+                insight = f"You are spending {difference}% more on {category} than recommended."
+                if difference < 5:
+                    score -= 5
+                elif difference < 10:
+                    score -= 10
+                else:
+                    score -= 20
+            elif difference < 0:
+                insight = f"You are spending {difference * -1}% less on {category} than recommended."
+            analysis.append(insight)
+        if expense_total > income_total:
+            score -= 25
+        elif expense_total == income_total:
+            score -= 15
+        if savings_percent < 5:
+            score -= 20
+        elif savings_percent < 10:
+            score -= 15
+        elif savings_percent < 20:
+            score -= 10
+    else:
+        analysis.append('No income added')
+        score = 0
+    if score < 0:
+        score = 0
 
     return render_template(
         "dashboard.html",
@@ -264,7 +300,9 @@ def dashboard():
         recommended_category_list_percents=recommended_category_list_percents,
         recommended_percent_list_percents=recommended_percent_list_percents,
         next_limit=next_limit,
-        mode=mode
+        mode=mode,
+        analysis=analysis,
+        score=score
     )
 
 @app.route("/logout")

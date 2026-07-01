@@ -386,3 +386,123 @@ a {
 .chart_card canvas {
     max-height: 350px;
 }
+
+.amount_badge{
+    background:#ecfdf5;
+    color:#059669;
+    padding:12px 18px;
+    border-radius:50px;
+    font-weight:700;
+    font-size:1.1rem;
+}
+
+.expense + .transaction_details .amount_badge{
+    background:#fef2f2;
+    color:#dc2626;
+}
+
+.card:nth-child(1){
+    border-top:5px solid #2563eb;
+}
+
+.card:nth-child(2){
+    border-top:5px solid #10b981;
+}
+
+.card:nth-child(3){
+    border-top:5px solid #ef4444;
+}
+
+.card:nth-child(4){
+    border-top:5px solid #f59e0b;
+}
+
+.pagination_actions{
+    display:flex;
+    justify-content:center;
+    gap:16px;
+    margin:40px 0;
+    flex-wrap:wrap;
+}
+
+.secondary_button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    border-radius: 8px;           
+    font-weight: 600;
+    background: #2563eb;
+    color: white;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15);
+    transition: 0.2s ease;
+    width: auto;
+    min-width: 90px;
+    height: 38px;          
+    padding: 0 14px;
+}
+
+.secondary_button:hover{
+    transform:translateY(-2px);
+    background:#1d4ed8;
+}
+
+.secondary_light{
+    background:#f3f4f6;
+    color:#374151;
+    box-shadow:none;
+}
+
+.secondary_light:hover{
+    background:#e5e7eb;
+}
+
+.insights{
+    margin-top:40px;
+    background:white;
+    padding:28px;
+    border-radius:20px;
+    box-shadow:
+        0 8px 20px rgba(0,0,0,.06);
+}
+
+.insights h3{
+    margin-top:0;
+    margin-bottom:20px;
+    font-size:1.3rem;
+}
+
+.insights p{
+    margin:12px 0;
+    padding-left:18px;
+    border-left:4px solid #2563eb;
+    color:#4b5563;
+}
+
+.financial_score{
+    margin-top:30px;
+    background:linear-gradient(
+        135deg,
+        #2563eb,
+        #1d4ed8
+    );
+    color:white;
+    padding:28px;
+    border-radius:22px;
+    text-align:center;
+    box-shadow:
+        0 12px 28px rgba(37,99,235,.25);
+}
+
+.financial_score h2{
+    margin:0;
+    font-size:3rem;
+}
+
+.financial_score span{
+    display:block;
+    margin-top:8px;
+    font-size:1rem;
+    opacity:.9;
+}
